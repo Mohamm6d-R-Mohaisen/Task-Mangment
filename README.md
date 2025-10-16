@@ -1,61 +1,343 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🧩 Backend Skill Test – Laravel Project
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📘 Overview
 
-## About Laravel
+This project is a **modular backend API** built using **Laravel 11+**, designed to demonstrate best practices in backend architecture.  
+It covers database design, authentication, role-based permissions, API resource structure, middleware, service layer separation, notifications, queues, and caching.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Key Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Authentication System** for Admins & Users (multi-guard)
+- **Role & Permission Management** using [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission/v6)
+- **Project / Task / Comment Management** APIs
+- **Search & Filter Traits** for reusable Eloquent scopes
+- **Task Assignment Service** with Notification & Email Queue
+- **Activity Logging Middleware**
+- **Response in JSON format**
+- **Caching for performance optimization**
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🧱 Project Architecture
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```
+app/
+ ├── Http/
+ │    ├── Controllers/
+ │    │    ├── Api/
+ │    │    │    ├── ProjectController.php
+ │    │    │    ├── TaskController.php
+ │    │    │    └── CommentController.php
+ │    ├── Middleware/
+ │    │    └── LogUserActivity.php
+ │    └── Kernel.php
+ │
+ ├── Models/
+ │    ├── Admin.php
+ │    ├── User.php
+ │    ├── Project.php
+ │    ├── Task.php
+ │    └── Comment.php
+ │
+ ├── Services/
+ │    └── TaskAssignmentService.php
+ │
+ ├── Traits/
+ │    └── CommonQueryScopes.php
+ │
+ ├── Jobs/
+ │    └── SendTaskAssignedEmailJob.php
+ │
+ ├── Notifications/
+ │    └── TaskAssignedNotification.php
+ │
+resources/
+ └── views/
+      └── emails/
+           └── task_assigned.blade.php
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+routes/
+ ├── api.php
+ ├── web.php
+ ├── admin.php
+ └── console.php
+```
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ⚙️ Installation & Setup
 
-### Premium Partners
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/your-username/backend-skill-test.git
+cd backend-skill-test
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 2️⃣ Install dependencies
+```bash
+composer install
+```
 
-## Contributing
+### 3️⃣ Copy `.env` and set up environment
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4️⃣ Configure Database
+Edit `.env`:
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=skill_test
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Code of Conduct
+### 5️⃣ Run migrations and seeders
+```bash
+php artisan migrate --seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 6️⃣ Configure Mail (for queue email)
+Use [Mailtrap.io](https://mailtrap.io) or your SMTP:
+```
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_user
+MAIL_PASSWORD=your_pass
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@skilltest.com"
+MAIL_FROM_NAME="Project Manager"
+```
 
-## Security Vulnerabilities
+### 7️⃣ Configure Queue
+Set queue driver in `.env`:
+```
+QUEUE_CONNECTION=database
+```
+Then create tables:
+```bash
+php artisan queue:table
+php artisan queue:failed-table
+php artisan migrate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Run queue worker:
+```bash
+php artisan queue:work
+```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🔐 Authentication System
+
+This project uses **two guards**:
+
+- `admin` → for system administrators  
+- `web` → for normal users  
+
+Both are authenticated using **Laravel Sanctum**.
+
+**Login Example (POST /api/login):**
+```json
+{
+  "email": "admin@example.com",
+  "password": "password"
+}
+```
+
+Returns:
+```json
+{
+  "status": true,
+  "type": "admin",
+  "token": "..."
+}
+```
+
+---
+
+## 🧩 Role & Permission System
+
+The project uses **Spatie Laravel Permission** package to manage roles and permissions.
+
+Example:
+```bash
+php artisan permission:create-role admin
+php artisan permission:create-permission view_projects
+```
+
+Middleware example in controllers:
+```php
+$this->middleware('permission:view_projects|add_projects', ['only' => ['index','show']]);
+```
+
+---
+
+## 🧰 CommonQueryScopes Trait
+
+📄 `app/Traits/CommonQueryScopes.php`
+
+```php
+public function scopeFilterByStatus($query, $status)
+{
+    if (!empty($status)) return $query->where('status', $status);
+    return $query;
+}
+
+public function scopeSearchByTitle($query, $request)
+{
+    if (!empty($request->search['value'])) {
+        $search = '%' . $request->search['value'] . '%';
+        return $query->where('title', 'LIKE', $search);
+    }
+    if ($request->has('search')) {
+        $search = '%' . $request->search . '%';
+        return $query->where('title', 'LIKE', $search);
+    }
+    return $query;
+}
+```
+
+Used in:
+- `ProjectController@index`
+- `TaskController@index`
+
+---
+
+## 🧮 Middleware: LogUserActivity
+
+📄 `app/Http/Middleware/LogUserActivity.php`
+
+Logs every authenticated API request with:
+- user_id
+- endpoint
+- method
+- timestamp
+- IP
+
+Enabled in `Kernel.php`:
+```php
+'log.user.activity' => \App\Http\Middleware\LogUserActivity::class,
+```
+
+Applied globally on API routes:
+```php
+Route::middleware(['auth:sanctum', 'log.user.activity'])->group(...);
+```
+
+---
+
+## 🧠 Service: TaskAssignmentService
+
+📄 `app/Services/TaskAssignmentService.php`
+
+Handles:
+- Task validation
+- Creation
+- Assigning to user
+- Dispatching email job
+
+```php
+dispatch(new SendTaskAssignedEmailJob($user, $task));
+```
+
+---
+
+## 📬 Job: SendTaskAssignedEmailJob
+
+📄 `app/Jobs/SendTaskAssignedEmailJob.php`
+
+Sends an **email notification** when a task is assigned using the mail view:
+`resources/views/emails/task_assigned.blade.php`
+
+Executed automatically by:
+```bash
+php artisan queue:work
+```
+
+---
+
+## 📨 Notifications
+
+📄 `app/Notifications/TaskAssignedNotification.php`
+
+Stores notifications in database and sends via email (queued with `ShouldQueue`).
+
+---
+
+## ⚡️ API Endpoints Summary
+
+| Method | Endpoint | Description | Permissions |
+|--------|-----------|--------------|--------------|
+| POST | `/api/login` | Login for admin/user | Public |
+| GET | `/api/projects` | List all projects | `view_projects` |
+| POST | `/api/projects` | Create new project | `add_projects` |
+| GET | `/api/projects/{id}` | View single project | `view_projects` |
+| GET | `/api/projects/{id}/tasks` | List project tasks | `view_tasks` |
+| POST | `/api/projects/{id}/tasks` | Assign new task | `add_tasks` |
+| PATCH | `/api/tasks/{id}` | Update task | `edit_tasks` |
+| DELETE | `/api/tasks/{id}` | Delete task | `delete_tasks` |
+
+---
+
+## 🧮 Caching Example
+
+To optimize performance, project and task lists are cached for 60 minutes:
+
+```php
+Cache::remember('projects_list', 60, function() {
+    return Project::with('creator')->get();
+});
+```
+
+When tasks or projects are updated:
+```php
+Cache::forget('projects_list');
+```
+
+---
+
+## 🧾 Testing Queue & Mail
+
+1. Start queue worker:
+   ```bash
+   php artisan queue:work
+   ```
+2. Assign a task to a user through API.
+3. Check Mailtrap inbox — you’ll receive an email with task details.
+4. Check `storage/logs/laravel.log` for activity logs.
+
+---
+
+## ✅ Requirements
+
+- PHP 8.2+
+- Laravel 11+
+- MySQL 8+
+- Composer
+- Queue driver (database or Redis)
+- Mail driver configured (Mailtrap or SMTP)
+
+---
+
+## 📗 References
+
+- [Laravel Official Docs](https://laravel.com/docs/12.x)
+- [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission/v6)
+- [Laravel Queues & Jobs](https://laravel.com/docs/12.x/queues)
+- [Laravel Notifications](https://laravel.com/docs/12.x/notifications)
+- [Laravel Caching](https://laravel.com/docs/12.x/cache)
+
+---
+
+## 🧑‍💻 Author
+
+**Developer:** Mohammad Mohaisen  
+**Framework:** Laravel 11  
+**Focus:** Clean architecture, modular services, and queued notifications.
