@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>تحديث المنتج</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>تحديث المنتج</h2>
+        
+        <form method="POST" action="{{ route('admin.projects.update', $project->id) }}" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            
+            <!-- بيانات المنتج الأساسية -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">اسم المنتج</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ $project->name }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="url" class="form-label">رابط المنتج</label>
+                        <input type="url" class="form-control" id="url" name="url" value="{{ $project->url }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="category_id" class="form-label">الفئة</label>
+                <select class="form-control" id="category_id" name="category_id" required>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ $project->category_id == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="overview" class="form-label">نظرة عامة</label>
+                <textarea class="form-control" id="overview" name="overview" rows="3">{{ $project->overview }}</textarea>
+            </div>
+            
+            <!-- الصور الموجودة -->
+            <div class="mb-4">
+                <h4>الصور الموجودة</h4>
+                <div class="row">
+                    @foreach($project->images as $image)
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <img src="{{ $image->image }}" class="card-img-top" alt="صورة المنتج" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="id[]" value="{{ $image->id }}" id="image_{{ $image->id }}" checked>
+                                        <label class="form-check-label" for="image_{{ $image->id }}">
+                                            الاحتفاظ بهذه الصورة
+                                        </label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label for="existing_image_{{ $image->id }}" class="form-label">تحديث الصورة</label>
+                                        <input type="file" class="form-control" name="existing_image[]" 
+                                               id="existing_image_{{ $image->id }}" 
+                                               data-image-id="{{ $image->id }}"
+                                               accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            
+            <!-- الصور الجديدة -->
+            <div class="mb-4">
+                <h4>إضافة صور جديدة</h4>
+                <div class="mb-3">
+                    <label for="images" class="form-label">اختر صور جديدة</label>
+                    <input type="file" class="form-control" id="images" name="images[]" multiple accept="image/*">
+                    <div class="form-text">يمكنك اختيار أكثر من صورة في نفس الوقت</div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">إلغاء</button>
+                <button type="submit" class="btn btn-primary">تحديث المنتج</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('admin/js_resource/projects.js') }}"></script>
+    
+    <script>
+        // معاينة الصور المحددة
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // يمكن إضافة معاينة للصورة هنا
+                        console.log('تم اختيار صورة جديدة:', file.name);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+        
+        // التحقق من الصور المحددة
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const checkedImages = document.querySelectorAll('input[name="id[]"]:checked');
+            const newImages = document.querySelector('input[name="images[]"]').files;
+            
+            if (checkedImages.length === 0 && newImages.length === 0) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'تحذير!',
+                    text: 'يجب اختيار صورة واحدة على الأقل',
+                    icon: 'warning',
+                    confirmButtonText: 'حسناً'
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
